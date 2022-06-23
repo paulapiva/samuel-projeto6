@@ -1,0 +1,132 @@
+//crie a bola, raqueteJogador e raqueteComputador como objetos de sprite
+var bola = createSprite(200,200,10,10);
+bola.setAnimation("soccerBall");
+
+var raqueteJogador = createSprite(380,200,10,70);
+raqueteJogador.setAnimation("jogador");
+var raqueteComputador = createSprite(20,200,10,70);
+raqueteComputador.setAnimation("robot");
+
+var estadoJogo = "sacar";
+var placarComputador = 0;
+var placarJogador = 0;
+var count = World.seconds;
+function draw() {
+  //limpa a tela
+  background("white");
+ 
+  /*if (keyWentDown("k")) {
+    raqueteJogador.setAnimation("jogador1");
+  }
+  if (keyWentUp("k")) {
+    raqueteJogador.setAnimation("jogador");
+  }*/
+  
+  
+  
+  text("Placar Computador", 60, 15);
+  text(placarComputador, 100, 40);
+  text("Placar Jogador", 270, 15);
+  text(placarJogador, 300, 40);
+  
+  if (estadoJogo === "sacar"){
+    text("Aperte espaço       para começar", 110, 200);
+   sacar();
+    
+  }
+  
+  //faça com que a raquete do jogador se mova com a posição y do mouse
+  raqueteJogador.y = World.mouseY;
+  
+  //faça raquete do computador se mover com a posição y da bola
+  //raqueteComputador.y = bola.y;
+  movimentoComputador();
+  
+  
+  //Chamada de funções
+  redefinirBola();
+  criaRede();
+ 
+  
+  //criar limites
+  //faça a bola quicar com as bordas superior e inferior
+  createEdgeSprites();
+  
+  if (bola.bounceOff(topEdge) || bola.bounceOff(bottomEdge)){
+    playSound("sound://category_hits/retro_game_hit_block_4.mp3");
+  }
+  
+   
+  if(bola.bounceOff(raqueteComputador) || bola.bounceOff(raqueteJogador)) {
+   playSound("sound://category_accent/puzzle_game_accent_a_01.mp3");
+  }
+
+  
+   //desenhe os sprites na tela
+  drawSprites();
+}
+
+
+//Cria a rede
+function criaRede() {
+  for (var i = 0; i < 400; i=i+20) {
+    line(200, i, 200, i=i+10);
+  }
+}
+
+//redefina a bola para o centro se ela cruzar a tela
+function redefinirBola() {
+  if(bola.x > 400 || bola.x <0) {
+    playSound("sound://category_digital/coin_3.mp3");
+    if (bola.x>400) {
+      placarComputador = placarComputador +1;
+      raqueteJogador.setAnimation("jogadorCai");
+      
+    }
+  if (bola.x<0) {
+    placarJogador = placarJogador +1;
+  }
+    
+    bola.x = 200;
+    bola.y = 200;
+    bola.velocityX = 0;
+    bola.velocityY = 0;
+    estadoJogo = "sacar";
+  }
+  if (placarComputador === 5 || placarJogador === 5) {
+    estadoJogo = "fim";
+    text("Fim de Jogo", 170, 150);
+    text("Aperte R para recomeçar", 150, 170);
+    
+  }
+  
+  if (keyDown("r")&& estadoJogo === "fim") {
+    estadoJogo = "sacar";
+    placarComputador = 0;
+    placarJogador = 0;
+  }
+  
+}
+
+//sacar a bola quando o espaço é pressionado
+function sacar() {
+  if (keyDown("space")&& estadoJogo === "sacar") {
+    raqueteJogador.setAnimation("jogador");
+    bola.velocityY = 3;
+    bola.velocityX = 4;
+    estadoJogo = "jogar";
+    
+    
+  }
+}
+function movimentoComputador() {
+  if (keyDown("w")) {
+    raqueteComputador.y = raqueteComputador.y -5;
+  }
+  
+  
+  if (keyDown("s")) {
+    raqueteComputador.y = raqueteComputador.y +5;
+  }
+  
+}
